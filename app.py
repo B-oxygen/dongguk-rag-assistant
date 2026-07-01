@@ -12,6 +12,16 @@ os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 import streamlit as st
 
+# Streamlit Community Cloud는 시크릿을 st.secrets로만 제공한다. 라이브러리들이 읽는
+# 환경변수로 복사해 로컬(.env)과 배포(Cloud)를 모두 지원한다.
+# (로컬에 secrets.toml이 없으면 예외가 나며, 이때는 .env를 사용한다.)
+try:
+    _cloud_secrets = dict(st.secrets)
+except Exception:
+    _cloud_secrets = {}
+for _key, _value in _cloud_secrets.items():
+    os.environ.setdefault(_key, str(_value))
+
 from rag import AIAssistant, create_assistant
 
 st.set_page_config(page_title="나의 AI 비서", page_icon="🤖", layout="centered")
