@@ -1,0 +1,17 @@
+# 수업/개발용 전체 의존성 — 노트북, PDF 처리 등 앱 런타임에 불필요한 것 포함.
+# 로컬 전체 환경 설치: pip install -r requirements-dev.txt
+-r requirements.txt
+langchain
+langchain-openai
+langchain-chroma
+chromadb
+langchain-google-community[gcs]
+unstructured[pdf]
+pypdf
+pikepdf
+numexpr
+websockets
+defusedxml
+jupyter
+ipywidgets
+notebook

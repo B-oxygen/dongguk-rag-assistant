@@ -1,21 +1,10 @@
-langchain
+# 배포/런타임 의존성 — Streamlit Community Cloud가 이 파일을 설치합니다.
+# 앱(app.py, rag.py)이 실제로 import하는 최소 세트만 남겼습니다.
+# 수업/개발용 전체 패키지(jupyter, PDF 처리 등)는 requirements-dev.txt 참고.
+streamlit
 langchain-core
-langchain-text-splitters
 langchain-community
 langchain-google-genai
-langchain-google-community[gcs]
-langchain-openai
-langchain-chroma
-chromadb
+langchain-text-splitters
 faiss-cpu
-unstructured[pdf]
-pypdf
-pikepdf
-websockets
-defusedxml
 python-dotenv
-jupyter
-ipywidgets
-notebook
-streamlit
-numexpr
