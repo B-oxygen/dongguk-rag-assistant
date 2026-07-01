@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 환경변수 (API 키 — 절대 커밋 금지)
+.env
+
+# 생성된 FAISS 인덱스 (재생성 가능)
+faiss_index/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# 에이전트 / 툴 상태 (프로젝트 파일 아님)
+.omo/
+.codegraph

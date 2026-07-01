@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스타트업 AI 비서 서비스 개발 실전 슬라이드</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div id="deck-container">
+    <header>
+      <div class="logo-section">
+        <div class="logo-icon"></div>
+        <div class="logo-text">Google Cloud & Vertex AI 실전</div>
+      </div>
+      <div class="topic-tag">Startup AI MVP Course</div>
+    </header>
+
+    <div class="slides-wrapper">
+
+      <!-- ═══ SLIDE 1: TITLE — 대형 타이포그래피 ═══ -->
+      <div class="slide title-slide active" data-index="0">
+        <div class="slide-number">STARTUP AI MVP</div>
+        <h1>Google Cloud & Vertex AI 기반<br>스타트업 AI 비서 서비스 개발 실전</h1>
+        <p class="subtitle">Vertex AI, LangChain, Streamlit, Cloud Run을 활용한<br>실무 프로토타입 제작 가이드</p>
+        <div class="author-info">
+          <span>👨‍🏫 강사: 김일한</span>
+          <span>📅 2026. 07. 01</span>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 2: Vertex AI — 타임라인 ═══ -->
+      <div class="slide" data-index="1">
+        <div class="slide-header">
+          <div class="slide-number">01. Vertex AI</div>
+          <h2>Vertex AI: 통합 머신러닝 플랫폼</h2>
+        </div>
+        <div class="slide-body">
+          <p style="margin-bottom: 1.5rem; text-align: center; font-size: 0.95rem;">
+            데이터 준비부터 모델 배포 및 모니터링까지 — ML 라이프사이클 전체를 지원하는 <span class="highlight-text">완전관리형 AI 플랫폼</span>
+          </p>
+          <div class="timeline">
+            <div class="timeline-step">
+              <div class="timeline-dot active">1</div>
+              <div class="timeline-label">데이터 준비</div>
+              <div class="timeline-desc">Cloud Storage, BigQuery 등 다양한 소스 연동</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-dot active">2</div>
+              <div class="timeline-label">모델 개발</div>
+              <div class="timeline-desc">AutoML 자동 모델 생성 및 커스텀 학습</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-dot active">3</div>
+              <div class="timeline-label">모델 관리</div>
+              <div class="timeline-desc">버전 관리 및 Feature Store 활용</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-dot active">4</div>
+              <div class="timeline-label">엔드포인트 배포</div>
+              <div class="timeline-desc">온라인/배치 예측 서비스로 즉시 제공</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-dot active">5</div>
+              <div class="timeline-label">모니터링</div>
+              <div class="timeline-desc">성능 감시 및 데이터 드리프트 감지</div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: center; gap: 2.5rem; margin-top: 1.5rem; font-size: 0.78rem; color: var(--text-disabled);">
+            <span>✓ 인프라 관리 불필요</span>
+            <span>✓ 자동 스케일링</span>
+            <span>✓ 엔터프라이즈 보안</span>
+            <span>✓ Google Cloud 생태계 통합</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 3: GCS — 계층 다이어그램 ═══ -->
+      <div class="slide" data-index="2">
+        <div class="slide-header">
+          <div class="slide-number">02. Google Cloud Storage</div>
+          <h2>Google Cloud Storage (GCS) 구조</h2>
+        </div>
+        <div class="slide-body grid-2">
+          <div>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem;">높은 내구성(99.999999999%)과 무제한 확장성을 지닌 비정형 객체 스토리지</p>
+            <div class="schema-container">
+              <div class="schema-header">📦 구성 요소 계층</div>
+              <div class="schema-row">
+                <div class="schema-key">Bucket</div>
+                <div class="schema-val">데이터를 담는 최상위 컨테이너 (전역 고유 이름 필요)</div>
+              </div>
+              <div class="schema-row">
+                <div class="schema-key">Object</div>
+                <div class="schema-val">버킷 내 저장되는 개별 파일 + 메타데이터</div>
+              </div>
+              <div class="schema-row">
+                <div class="schema-key">Key (경로)</div>
+                <div class="schema-val"><code>images/photo.jpg</code>, <code>docs/report.pdf</code></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="schema-container">
+              <div class="schema-header">📊 스토리지 클래스 비교</div>
+              <div class="schema-row">
+                <div class="schema-key">Standard</div>
+                <div class="schema-val">자주 액세스 · 고가용성 · 짧은 지연</div>
+              </div>
+              <div class="schema-row">
+                <div class="schema-key">Nearline</div>
+                <div class="schema-val">월 1회 액세스 · 저비용 백업</div>
+              </div>
+              <div class="schema-row">
+                <div class="schema-key">Coldline</div>
+                <div class="schema-val">분기 1회 액세스 · 더 낮은 비용</div>
+              </div>
+              <div class="schema-row">
+                <div class="schema-key">Archive</div>
+                <div class="schema-val">연 1회 미만 · 가장 저렴 · 장기 보관</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 4: 페르소나 — 폼 UI ═══ -->
+      <div class="slide" data-index="3">
+        <div class="slide-header">
+          <div class="slide-number">03. Prompt Engineering</div>
+          <h2>AI 페르소나 및 Tone & Manner 설계</h2>
+        </div>
+        <div class="slide-body grid-2">
+          <div>
+            <p style="margin-bottom: 0.8rem; font-size: 0.9rem;">
+              역할, 목표, 어조를 정밀하게 구성하면 응답의 <span class="highlight-text">전문성과 일관성</span>이 대폭 향상됩니다.
+            </p>
+            <div class="form-ui">
+              <div class="form-bar">📋 페르소나 구성 요소</div>
+              <div class="form-field">
+                <div class="form-label">역할</div>
+                <div class="form-value">AI가 수행할 직무 / 직책 정의</div>
+              </div>
+              <div class="form-field">
+                <div class="form-label">경험</div>
+                <div class="form-value">경력 수준 및 전문성 깊이</div>
+              </div>
+              <div class="form-field">
+                <div class="form-label">전문분야</div>
+                <div class="form-value">핵심 기술 스택 및 세부 영역</div>
+              </div>
+              <div class="form-field">
+                <div class="form-label">목표</div>
+                <div class="form-value">프롬프트로 달성할 구체적 태스크</div>
+              </div>
+              <div class="form-field">
+                <div class="form-label">제약조건</div>
+                <div class="form-value">반드시 준수할 경계와 규칙</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="form-ui">
+              <div class="form-bar">✍️ 실무 프롬프트 예시</div>
+              <div class="form-field">
+                <div class="form-label">역할</div>
+                <div class="form-value"><span class="form-tag">Role</span> Python 교육 전문가</div>
+              </div>
+              <div class="form-field">
+                <div class="form-label">목표</div>
+                <div class="form-value"><span class="form-tag">Goal</span> 초보자에게 Pandas 설명</div>
+              </div>
+              <div class="form-field">
+                <div class="form-label">대상</div>
+                <div class="form-value"><span class="form-tag">Target</span> 비전공자 입문자</div>
+              </div>
+              <div class="form-field">
+                <div class="form-label">어조</div>
+                <div class="form-value"><span class="form-tag">Tone</span> 친절하고 쉬운 말투</div>
+              </div>
+              <div class="form-field">
+                <div class="form-label">출력 형식</div>
+                <div class="form-value"><span class="form-tag">Format</span> 개념 → 예제 → 요약</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 5: 환각 방지 — 넘버링 타이포 ═══ -->
+      <div class="slide" data-index="4">
+        <div class="slide-header">
+          <div class="slide-number">04. Prompt Engineering</div>
+          <h2>환각(Hallucination) 방지 기법</h2>
+        </div>
+        <div class="slide-body">
+          <div class="numbered-grid">
+            <div class="numbered-item">
+              <div class="num-badge">01</div>
+              <div><div class="num-title">모르면 솔직하게</div><div class="num-desc">"추측하지 말고 '알 수 없습니다'라고 답하세요."</div></div>
+            </div>
+            <div class="numbered-item">
+              <div class="num-badge">02</div>
+              <div><div class="num-title">근거 제시 의무화</div><div class="num-desc">"주장에는 반드시 배경 데이터를 함께 기술하세요."</div></div>
+            </div>
+            <div class="numbered-item">
+              <div class="num-badge">03</div>
+              <div><div class="num-title">사실과 추론 분리</div><div class="num-desc">"확인된 사실과 논리적 추론을 구분하여 서술하세요."</div></div>
+            </div>
+            <div class="numbered-item">
+              <div class="num-badge">04</div>
+              <div><div class="num-title">출처 명시 강제</div><div class="num-desc">"답변의 근거가 된 도서, 논문, 공식 문서를 제시하세요."</div></div>
+            </div>
+            <div class="numbered-item">
+              <div class="num-badge">05</div>
+              <div><div class="num-title">보수적 표현 사용</div><div class="num-desc">"불확실하면 '가능성이 있습니다'로 표현하세요."</div></div>
+            </div>
+            <div class="numbered-item">
+              <div class="num-badge">06</div>
+              <div><div class="num-title">범위 제한 설정</div><div class="num-desc">"제공된 문서 안의 정보로만 답변하세요."</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 6: 검증 — 플로우 순환도 ═══ -->
+      <div class="slide" data-index="5">
+        <div class="slide-header">
+          <div class="slide-number">05. Validation Methods</div>
+          <h2>다차원 프롬프트 검증 방법론</h2>
+        </div>
+        <div class="slide-body">
+          <p style="text-align: center; margin-bottom: 1.2rem; font-size: 0.9rem;">LLM 답변의 정확도를 극대화하기 위한 <span class="highlight-text">4단계 검증 체인</span></p>
+          <div class="flow-cycle">
+            <div class="flow-node">
+              <div class="flow-node-label">1. 답변 생성</div>
+              <div class="flow-node-desc">초안 작성</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+              <div class="flow-node-label">2. 비판적 검토</div>
+              <div class="flow-node-desc">반대 의견 요청</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+              <div class="flow-node-label">3. 사실 검증</div>
+              <div class="flow-node-desc">교차 / 출처 확인</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+              <div class="flow-node-label">4. 최종 수정</div>
+              <div class="flow-node-desc">오류 반영 재작성</div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; font-size: 0.78rem;">
+            <div style="text-align: center; color: var(--text-muted);"><strong style="display: block; color: var(--text-main); margin-bottom: 0.15rem;">교차 검증</strong>동일 질문을 여러 LLM에 동시 전달</div>
+            <div style="text-align: center; color: var(--text-muted);"><strong style="display: block; color: var(--text-main); margin-bottom: 0.15rem;">Red Teaming</strong>답변에 대한 반론과 오류 지적 요청</div>
+            <div style="text-align: center; color: var(--text-muted);"><strong style="display: block; color: var(--text-main); margin-bottom: 0.15rem;">교수 리뷰</strong>엄격한 전문가 관점에서 평가 채점</div>
+            <div style="text-align: center; color: var(--text-muted);"><strong style="display: block; color: var(--text-main); margin-bottom: 0.15rem;">배심원단</strong>다수 페르소나 토론 후 합의안 도출</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 7: RAG — 아키텍처 다이어그램 ═══ -->
+      <div class="slide" data-index="6">
+        <div class="slide-header">
+          <div class="slide-number">06. RAG Concept</div>
+          <h2>RAG (검색 증강 생성) 아키텍처</h2>
+        </div>
+        <div class="slide-body">
+          <p style="text-align: center; margin-bottom: 1.2rem; font-size: 0.9rem;">외부 지식 베이스를 실시간 조회하여 LLM 응답의 <span class="highlight-text">정확도와 신뢰성</span>을 높이는 핵심 기법</p>
+          <div class="arch-diagram">
+            <div class="arch-col">
+              <div class="arch-icon">👤</div>
+              <div class="arch-label">사용자</div>
+              <div class="arch-desc">자연어 질문 입력</div>
+            </div>
+            <div class="arch-col">
+              <div class="arch-icon">🔍</div>
+              <div class="arch-label">Retriever</div>
+              <div class="arch-desc">벡터 DB에서<br>유사 문서 검색</div>
+            </div>
+            <div class="arch-col">
+              <div class="arch-icon">📚</div>
+              <div class="arch-label">Knowledge Base</div>
+              <div class="arch-desc">PDF, DB, Wiki 등<br>외부 지식 저장소</div>
+            </div>
+            <div class="arch-col">
+              <div class="arch-icon">🧠</div>
+              <div class="arch-label">LLM</div>
+              <div class="arch-desc">질문 + 검색 결과를<br>컨텍스트로 처리</div>
+            </div>
+            <div class="arch-col">
+              <div class="arch-icon">💬</div>
+              <div class="arch-label">답변 생성</div>
+              <div class="arch-desc">출처 기반의<br>신뢰성 높은 응답</div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.2rem; font-size: 0.75rem; color: var(--text-disabled);">
+            <span>✓ 최신 정보 반영</span>
+            <span>✓ 환각(Hallucination) 감소</span>
+            <span>✓ 도메인 특화 가능</span>
+            <span>✓ 출처 추적 가능</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 8: LangChain — 허브 다이어그램 ═══ -->
+      <div class="slide" data-index="7">
+        <div class="slide-header">
+          <div class="slide-number">07. LangChain Framework</div>
+          <h2>왜 랭체인(LangChain)인가?</h2>
+        </div>
+        <div class="slide-body">
+          <p style="text-align: center; margin-bottom: 0.5rem; font-size: 0.9rem;">LLM, 프롬프트, 데이터, 도구를 연결하는 <span class="highlight-text">파이프라인 프레임워크</span></p>
+          <div class="hub-container">
+            <div class="hub-center">
+              <span style="font-size: 1.3rem;">🔗</span>
+              <span>LangChain</span>
+            </div>
+            <div class="hub-spokes">
+              <div class="hub-node" style="top: 5%; left: 5%;">
+                <div class="hub-node-title">LLM 연동</div>
+                <div class="hub-node-desc">OpenAI, Vertex AI, HF</div>
+              </div>
+              <div class="hub-node" style="top: 5%; right: 5%;">
+                <div class="hub-node-title">Prompt Template</div>
+                <div class="hub-node-desc">재사용 가능한 설계</div>
+              </div>
+              <div class="hub-node" style="bottom: 5%; left: 2%;">
+                <div class="hub-node-title">Memory</div>
+                <div class="hub-node-desc">대화 맥락 유지</div>
+              </div>
+              <div class="hub-node" style="bottom: 5%; left: 35%;">
+                <div class="hub-node-title">Vector DB</div>
+                <div class="hub-node-desc">FAISS, Pinecone</div>
+              </div>
+              <div class="hub-node" style="bottom: 5%; right: 2%;">
+                <div class="hub-node-title">Agent & Tools</div>
+                <div class="hub-node-desc">동적 도구 실행</div>
+              </div>
+              <div class="hub-node" style="top: 43%; left: -2%;">
+                <div class="hub-node-title">Data Loader</div>
+                <div class="hub-node-desc">PDF, 웹 데이터</div>
+              </div>
+              <div class="hub-node" style="top: 43%; right: -2%;">
+                <div class="hub-node-title">Chains</div>
+                <div class="hub-node-desc">다단계 논리 처리</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 9: LangChain Workflow — 수평 파이프라인 ═══ -->
+      <div class="slide" data-index="8">
+        <div class="slide-header">
+          <div class="slide-number">08. LangChain Workflow</div>
+          <h2>LangChain RAG 전체 처리 흐름</h2>
+        </div>
+        <div class="slide-body">
+          <div class="timeline" style="margin-top: 1rem;">
+            <div class="timeline-step">
+              <div class="timeline-dot">1</div>
+              <div class="timeline-label">Document Loader</div>
+              <div class="timeline-desc">PDF, 웹페이지 등에서 원시 데이터를 추출</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-dot">2</div>
+              <div class="timeline-label">Text Splitter</div>
+              <div class="timeline-desc">문서를 검색에 적합한 크기의 청크로 분할</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-dot">3</div>
+              <div class="timeline-label">Embedding</div>
+              <div class="timeline-desc">텍스트 조각을 고차원 벡터로 변환</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-dot">4</div>
+              <div class="timeline-label">Vector Store</div>
+              <div class="timeline-desc">벡터와 메타데이터를 FAISS 등에 저장</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-dot">5</div>
+              <div class="timeline-label">Retriever</div>
+              <div class="timeline-desc">유사도가 높은 문서 조각을 검색</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-dot active">6</div>
+              <div class="timeline-label">LLM 생성</div>
+              <div class="timeline-desc">문서 원문을 컨텍스트에 결합해 정답 도출</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 10: FAISS — 스키마 테이블 ═══ -->
+      <div class="slide" data-index="9">
+        <div class="slide-header">
+          <div class="slide-number">09. Vector Database</div>
+          <h2>FAISS 벡터 DB 내부 저장 구조</h2>
+        </div>
+        <div class="slide-body grid-2">
+          <div>
+            <div class="schema-container" style="margin-bottom: 0.8rem;">
+              <div class="schema-header">🗂️ FAISS Index (벡터 저장)</div>
+              <div class="schema-row"><div class="schema-key">ID: 0</div><div class="schema-val">[0.123, -0.456, …, 0.789]</div></div>
+              <div class="schema-row"><div class="schema-key">ID: 1</div><div class="schema-val">[-0.111, 0.234, …, -0.321]</div></div>
+              <div class="schema-row"><div class="schema-key">ID: 2</div><div class="schema-val">[0.987, -0.654, …, 0.111]</div></div>
+            </div>
+            <div class="schema-container">
+              <div class="schema-header">🔗 ID 매핑 (index → docstore)</div>
+              <div class="schema-row"><div class="schema-key">Index 0</div><div class="schema-val">→ doc_0</div></div>
+              <div class="schema-row"><div class="schema-key">Index 1</div><div class="schema-val">→ doc_1</div></div>
+              <div class="schema-row"><div class="schema-key">Index 2</div><div class="schema-val">→ doc_2</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="schema-container" style="margin-bottom: 0.8rem;">
+              <div class="schema-header">📄 DocStore (원본 문서 저장)</div>
+              <div class="schema-row"><div class="schema-key">doc_0</div><div class="schema-val">page_content: "문서 내용..." · source: a.pdf, p.1</div></div>
+              <div class="schema-row"><div class="schema-key">doc_1</div><div class="schema-val">page_content: "문서 내용..." · source: a.pdf, p.2</div></div>
+              <div class="schema-row"><div class="schema-key">doc_2</div><div class="schema-val">page_content: "AI 내용..." · source: b.pdf, p.5</div></div>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-disabled); padding: 0.5rem 0; line-height: 1.5;">
+              <strong style="color: var(--text-main);">검색 흐름:</strong>
+              질문 임베딩 → FAISS에서 유사 벡터 ID 추출 → 매핑으로 문서 ID 확보 → DocStore에서 원본 텍스트 + 메타데이터 반환
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 11: Streamlit — 코드 에디터 + 미리보기 ═══ -->
+      <div class="slide" data-index="10">
+        <div class="slide-header">
+          <div class="slide-number">10. Frontend Development</div>
+          <h2>Streamlit: 초고속 AI 웹앱 빌더</h2>
+        </div>
+        <div class="slide-body">
+          <p style="margin-bottom: 1rem; font-size: 0.9rem; text-align: center;">HTML/CSS 없이 <span class="highlight-text">Python 코드만으로</span> 인터랙티브한 웹 앱 구현 및 배포</p>
+          <div class="editor-container">
+            <div class="editor-pane">
+              <div class="editor-bar">
+                <div class="editor-dot r"></div>
+                <div class="editor-dot y"></div>
+                <div class="editor-dot g"></div>
+                <div class="editor-filename">app.py</div>
+              </div>
+              <div class="editor-code"><span class="kw">import</span> streamlit <span class="kw">as</span> st
+
+st.<span class="fn">title</span>(<span class="st">"나의 AI 비서"</span>)
+
+user_input = st.<span class="fn">text_input</span>(
+    <span class="st">"질문을 입력하세요:"</span>
+)
+
+<span class="kw">if</span> st.<span class="fn">button</span>(<span class="st">"답변 생성"</span>):
+    <span class="kw">with</span> st.<span class="fn">spinner</span>(<span class="st">"생각 중..."</span>):
+        <span class="cm"># LLM 호출 로직</span>
+        answer = get_answer(user_input)
+        st.<span class="fn">write</span>(answer)</div>
+            </div>
+            <div class="preview-pane">
+              <div class="preview-bar">
+                <span>🔴 🟡 🟢</span>
+                <div class="preview-url">localhost:8501</div>
+              </div>
+              <div class="preview-body">
+                <div class="preview-title">나의 AI 비서</div>
+                <input class="preview-input" value="Streamlit이 뭔가요?" readonly>
+                <div class="preview-btn">답변 생성</div>
+                <div style="margin-top: 0.8rem; padding: 0.6rem; background: var(--card-bg); border-radius: 6px; font-size: 0.72rem; color: var(--text-muted); line-height: 1.4;">
+                  Streamlit은 Python만으로 데이터 앱을 쉽고 빠르게 만들 수 있는 오픈소스 프레임워크입니다.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 12: Cloud Run — 스텝 파이프라인 ═══ -->
+      <div class="slide" data-index="11">
+        <div class="slide-header">
+          <div class="slide-number">11. Serverless Deployment</div>
+          <h2>Google Cloud Run 서버리스 배포</h2>
+        </div>
+        <div class="slide-body">
+          <p style="text-align: center; margin-bottom: 1rem; font-size: 0.9rem;">인프라 관리 없이 컨테이너를 몇 초 만에 배포하는 <span class="highlight-text">완전관리형 서버리스 플랫폼</span></p>
+          <div class="step-pipeline">
+            <div class="pipeline-step">
+              <div class="pipeline-icon">📝</div>
+              <div class="pipeline-label">코드 작성</div>
+              <div class="pipeline-desc">로컬 개발 및 Dockerfile 준비</div>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipeline-icon">📦</div>
+              <div class="pipeline-label">이미지 빌드</div>
+              <div class="pipeline-desc">docker build 실행</div>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipeline-icon">☁️</div>
+              <div class="pipeline-label">레지스트리 푸시</div>
+              <div class="pipeline-desc">Artifact Registry에 업로드</div>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipeline-icon">🚀</div>
+              <div class="pipeline-label">Cloud Run 배포</div>
+              <div class="pipeline-desc">gcloud run deploy 실행</div>
+            </div>
+            <div class="pipeline-step">
+              <div class="pipeline-icon">🌐</div>
+              <div class="pipeline-label">글로벌 서비스</div>
+              <div class="pipeline-desc">자동 확장 및 HTTPS 제공</div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; font-size: 0.78rem; color: var(--text-disabled);">
+            <span>✓ 자동 스케일링 (0 to N)</span>
+            <span>✓ 사용한 만큼만 과금</span>
+            <span>✓ 몇 초 만에 배포 완료</span>
+            <span>✓ Google 글로벌 네트워크</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SLIDE 13: 결론 — 대형 인용문 타이포 ═══ -->
+      <div class="slide" data-index="12">
+        <div class="slide-header">
+          <div class="slide-number">Conclusion</div>
+          <h2>성공적인 AI MVP 개발을 위한 기본 소양</h2>
+        </div>
+        <div class="slide-body">
+          <div class="quote-section">
+            <div class="quote-text">
+              프롬프트 기술을 아는 것보다 중요한 것은<br>
+              <em>프롬프터 본인의 태도와 도메인 깊이</em>입니다.
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-disabled); margin-bottom: 0.5rem;">
+              AI를 수동적 도구가 아닌 파트너로 여기고, 대화를 통해 답변을 점진적으로 개선해 나가세요.
+            </p>
+            <div class="trait-row">
+              <div class="trait-item">
+                <div class="trait-emoji">🧠</div>
+                <div class="trait-label">도메인 전문성</div>
+                <div class="trait-desc">결과의 결함을 검증할<br>전문적 깊이</div>
+              </div>
+              <div class="trait-item">
+                <div class="trait-emoji">📖</div>
+                <div class="trait-label">인문학적 소양</div>
+                <div class="trait-desc">질문의 깊이를 더하는<br>통찰과 작문력</div>
+              </div>
+              <div class="trait-item">
+                <div class="trait-emoji">✨</div>
+                <div class="trait-label">암묵지 & 센스</div>
+                <div class="trait-desc">정형화되지 않는<br>상황 제어 감각</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="controls-bar">
+      <button class="menu-btn" id="menu-toggle-btn">
+        <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        목차
+      </button>
+      <div class="progress-section">
+        <div class="progress-container"><div class="progress-fill" id="progress-bar"></div></div>
+        <div class="progress-counter" id="slide-counter">1 / 13</div>
+      </div>
+      <div class="nav-buttons">
+        <button class="nav-btn" id="prev-btn" title="이전 (←)">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <button class="nav-btn" id="next-btn" title="다음 (→)">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar-drawer">
+    <div class="sidebar-header">
+      <div class="sidebar-title">슬라이드 목차</div>
+      <button class="close-btn" id="sidebar-close-btn">&times;</button>
+    </div>
+    <ul class="slide-list" id="sidebar-list"></ul>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const slides = document.querySelectorAll('.slide');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const progressBar = document.getElementById('progress-bar');
+      const slideCounter = document.getElementById('slide-counter');
+      const menuToggleBtn = document.getElementById('menu-toggle-btn');
+      const sidebarDrawer = document.getElementById('sidebar-drawer');
+      const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+      const sidebarList = document.getElementById('sidebar-list');
+
+      let currentSlide = 0;
+      const totalSlides = slides.length;
+
+      slides.forEach((slide, idx) => {
+        const h = slide.querySelector('h2') || slide.querySelector('h1');
+        const t = h ? h.innerText.replace(/<br>/g, ' ') : `슬라이드 ${idx + 1}`;
+        const tr = t.length > 24 ? t.slice(0, 24) + '…' : t;
+        const li = document.createElement('li');
+        li.className = `slide-item ${idx === 0 ? 'active' : ''}`;
+        li.innerHTML = `<span class="slide-item-num">${String(idx + 1).padStart(2, '0')}</span><span>${tr}</span>`;
+        li.addEventListener('click', () => { goToSlide(idx); closeSidebar(); });
+        sidebarList.appendChild(li);
+      });
+      const sidebarItems = document.querySelectorAll('.slide-item');
+
+      function updateSlides() {
+        slides.forEach((s, i) => {
+          s.classList.remove('active', 'past', 'future');
+          s.classList.add(i === currentSlide ? 'active' : i < currentSlide ? 'past' : 'future');
+        });
+        progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+        slideCounter.innerText = `${currentSlide + 1} / ${totalSlides}`;
+        sidebarItems.forEach((item, i) => item.classList.toggle('active', i === currentSlide));
+      }
+      function goToSlide(i) { if (i >= 0 && i < totalSlides) { currentSlide = i; updateSlides(); } }
+      function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlides(); } }
+      function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlides(); } }
+
+      nextBtn.addEventListener('click', nextSlide);
+      prevBtn.addEventListener('click', prevSlide);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); prevSlide(); }
+      });
+
+      function openSidebar() { sidebarDrawer.classList.add('open'); }
+      function closeSidebar() { sidebarDrawer.classList.remove('open'); }
+      menuToggleBtn.addEventListener('click', openSidebar);
+      sidebarCloseBtn.addEventListener('click', closeSidebar);
+      document.addEventListener('click', (e) => {
+        if (!sidebarDrawer.contains(e.target) && e.target !== menuToggleBtn && !menuToggleBtn.contains(e.target)) closeSidebar();
+      });
+
+      updateSlides();
+    });
+  </script>
+</body>
+</html>
